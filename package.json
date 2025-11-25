@@ -1,0 +1,44 @@
+{
+  "name": "content-management-service",
+  "version": "1.0.0",
+  "description": "内容管理系统API服务",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production APP_ENV=production node src/index.js",
+    "start:test": "cross-env NODE_ENV=test APP_ENV=test node src/index.js",
+    "start:dev": "cross-env NODE_ENV=development APP_ENV=development node src/index.js",
+    "dev": "cross-env NODE_ENV=development APP_ENV=development node --watch src/index.js",
+    "dev:debug": "cross-env NODE_ENV=development APP_ENV=development DEBUG=true node --watch src/index.js",
+    "start:debug": "cross-env NODE_ENV=development APP_ENV=development DEBUG=true node src/index.js",
+    "debug": "cross-env NODE_ENV=development APP_ENV=development DEBUG=true node --inspect-brk=0.0.0.0:9229 src/index.js",
+    "debug:watch": "cross-env NODE_ENV=development APP_ENV=development DEBUG=true node --inspect-brk=0.0.0.0:9229 --watch src/index.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "content-management",
+    "api",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ali-oss": "^6.23.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "mongodb": "^6.3.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.2",
+    "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

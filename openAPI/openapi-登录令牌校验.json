@@ -1,0 +1,42 @@
+{
+  "module": {
+    "module": "OpenAPI 接口",
+    "moduleKey": "openapi"
+  },
+  "api": {
+    "title": "登录令牌校验",
+    "method": "POST",
+    "path": "/openapi/memberships/login/verify",
+    "description": "对登录接口返回的访问令牌进行有效性校验，确认令牌是否过期、账号状态及黑名单状态。",
+    "requestParams": {
+      "headers": [
+        {
+          "name": "Authorization",
+          "type": "string",
+          "required": true,
+          "description": "登录接口返回的访问令牌，格式为 Bearer TOKEN"
+        }
+      ]
+    },
+    "responseExample": {
+      "success": {
+        "code": "0000",
+        "message": "登录令牌校验成功",
+        "data": {
+          "phone": "13800138000",
+          "id": "USER000001",
+          "_id": "MNFIOHH6QOA3kg0z"
+        }
+      },
+      "failure": {
+        "code": "1300",
+        "message": "登录令牌无效或已过期",
+        "data": null
+      }
+    },
+    "notes": [
+      "当令牌失效、对应账号被禁用或存在黑名单记录时也会返回 200，但 code 与 message 表示具体失败原因。",
+      "若需要补充返回字段，可在 data 中扩展 additional 信息。"
+    ]
+  }
+}
