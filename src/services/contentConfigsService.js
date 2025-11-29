@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { BaseService } from './baseService.js';
 
 /**
@@ -19,8 +20,8 @@ export class ContentConfigsService extends BaseService {
    * 创建内容配置
    */
   async createContentConfig(data) {
-    if (!data.id || !data.code || !data.name) {
-      throw new Error('内容配置ID、编码和名称不能为空');
+    if (!data.code || !data.name) {
+      throw new Error('编码和名称不能为空');
     }
 
     // 检查编码是否已存在
@@ -29,11 +30,14 @@ export class ContentConfigsService extends BaseService {
       throw new Error('内容配置编码已存在');
     }
 
+    const configId = randomUUID();
     const configData = {
       ...data,
       status: data.status !== undefined ? data.status : false,
       tabs: data.tabs || [],
       description: data.description || '',
+      id: configId,
+      _id: configId,
     };
 
     return this.create(configData);

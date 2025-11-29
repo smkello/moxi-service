@@ -1,5 +1,6 @@
 import { DesignProjectsService } from '../services/designProjectsService.js';
 import { OssService } from '../services/ossService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 export class DesignProjectsController {
   constructor() {
@@ -17,7 +18,7 @@ export class DesignProjectsController {
   async listDesignProjects(req, res) {
     try {
       const projects = await this.service.listDesignProjects();
-      return res.json(projects);
+      return sendSuccess(res, projects);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -26,7 +27,7 @@ export class DesignProjectsController {
   async createDesignProject(req, res) {
     try {
       const project = await this.service.createDesignProject(req.body);
-      return res.status(201).json(project);
+      return sendSuccess(res, project, { statusCode: 201 });
     } catch (error) {
       const statusCode = error.message.includes('已存在') ? 409 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -38,7 +39,7 @@ export class DesignProjectsController {
       const { id } = req.params;
       await this.service.updateDesignProject(id, req.body);
       const project = await this.service.findById(id);
-      return res.json(project);
+      return sendSuccess(res, project);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 :
                         error.message.includes('已存在') ? 409 : 400;
@@ -50,7 +51,7 @@ export class DesignProjectsController {
     try {
       const { id } = req.params;
       await this.service.deleteDesignProject(id);
-      return res.json({ success: true });
+      return sendSuccess(res, { deleted: true });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -64,7 +65,7 @@ export class DesignProjectsController {
       if (!project) {
         return res.status(404).json({ error: '设计项目不存在', success: false });
       }
-      return res.json(project);
+      return sendSuccess(res, project);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -112,17 +113,60 @@ export class DesignProjectsController {
       const ossService = this.getOssService();
       const result = await ossService.uploadZip(filename, req.file.buffer);
 
-      return res.json({
-        success: true,
-        code: 'UPLOAD_SUCCESS',
-        message: '文件上传成功',
-        data: {
+      return sendSuccess(
+        res,
+        {
+          bizCode: 'UPLOAD_SUCCESS',
           projectId,
           projectCode,
           objectKey: result.objectKey,
           url: result.url,
         },
+        { message: '文件上传成功' },
+      );
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        code: 'OSS_UPLOAD_FAILED',
+        message: `上传失败: ${error.message}`,
       });
+    }
+  }
+
+  async uploadGlobalComponentLibrary(req, res) {
+    const libraryCode = req.body.libraryCode || req.body.library_code;
+
+    if (!libraryCode) {
+      return res.status(400).json({
+        success: false,
+        code: 'MISSING_PARAMS',
+        message: '组件库编码不能为空',
+      });
+    }
+
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({
+        success: false,
+        code: 'FILE_REQUIRED',
+        message: '请上传zip文件',
+      });
+    }
+
+    try {
+      const ossService = this.getOssService();
+      const filename = `${libraryCode}.zip`;
+      const result = await ossService.uploadZip(filename, req.file.buffer);
+
+      return sendSuccess(
+        res,
+        {
+          bizCode: 'UPLOAD_SUCCESS',
+          libraryCode,
+          objectKey: result.objectKey,
+          url: result.url,
+        },
+        { message: '组件库上传成功' },
+      );
     } catch (error) {
       return res.status(500).json({
         success: false,

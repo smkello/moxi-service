@@ -1,4 +1,5 @@
 import { BehaviorsService } from '../services/behaviorsService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 export class BehaviorsController {
   constructor() {
@@ -8,7 +9,7 @@ export class BehaviorsController {
   async listBehaviors(req, res) {
     try {
       const behaviors = await this.service.listBehaviors({ projectId: req.query.projectId });
-      return res.json(behaviors);
+      return sendSuccess(res, behaviors);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -17,7 +18,7 @@ export class BehaviorsController {
   async createBehavior(req, res) {
     try {
       const behavior = await this.service.createBehavior(req.body);
-      return res.status(201).json(behavior);
+      return sendSuccess(res, behavior, { statusCode: 201 });
     } catch (error) {
       const statusCode = error.message.includes('已存在') ? 409 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -29,7 +30,7 @@ export class BehaviorsController {
       const { id } = req.params;
       await this.service.updateBehavior(id, req.body);
       const behavior = await this.service.findById(id);
-      return res.json(behavior);
+      return sendSuccess(res, behavior);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 :
                         error.message.includes('已存在') ? 409 : 400;
@@ -41,7 +42,7 @@ export class BehaviorsController {
     try {
       const { id } = req.params;
       await this.service.deleteBehavior(id);
-      return res.json({ success: true });
+      return sendSuccess(res, { deleted: true });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -55,7 +56,7 @@ export class BehaviorsController {
       if (!behavior) {
         return res.status(404).json({ error: '行为不存在', success: false });
       }
-      return res.json(behavior);
+      return sendSuccess(res, behavior);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -68,7 +69,7 @@ export class BehaviorsController {
       if (!behavior) {
         return res.status(404).json({ error: '行为不存在', success: false });
       }
-      return res.json(behavior);
+      return sendSuccess(res, behavior);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }

@@ -52,8 +52,8 @@ const config = {
 
   // OSS 配置
   oss: {
-    accessKeyId: process.env.OSS_ACCESS_KEY_ID || '',
-    accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET || '',
+    accessKeyId: process.env.OSS_ACCESS_KEY_ID || 'LTAI5tKpHRaQbDwUkjNSnkVp',
+    accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET || 'oQVXOPVV6Hk21Vc7PmBw7HoX0umHOI',
     bucket: process.env.OSS_BUCKET || 'dynamic-web',
     region: process.env.OSS_REGION || 'oss-cn-shanghai',
     endpoint: process.env.OSS_ENDPOINT || 'https://oss-cn-shanghai.aliyuncs.com',

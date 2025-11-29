@@ -7,10 +7,10 @@ import { initDatabase, closeDatabase } from './database/index.js';
 import routes from './routes/index.js';
 import { renderHomePage, renderModulePage } from './docs/htmlRenderer.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
-import { createHeartbeatMiddleware } from '../../sdks/plugin/smk-heartbeat-sdk/src/index.js';
+import { createHeartbeatMiddleware, createHeartbeatRoutes } from '@smk/heartbeat-sdk';
 import { authMiddleware } from './middleware/authMiddlewareInstance.js';
-import { createHeartbeatRoutes } from '../../sdks/plugin/smk-heartbeat-sdk/src/index.js';
 import openApiRoutes from './routes/openApiRoutes.js';
+import apiDocsExportRoutes from './routes/apiDocsExportRoutes.js';
 
 const app = express();
 
@@ -58,6 +58,9 @@ app.use('/api', createHeartbeatMiddleware({
   whitelist: [],
   forceCheck: config.sdk?.heartbeat?.forceCheck || false,
 }));
+
+// 接口文档导出路由（不需要登录校验，在认证中间件之前注册）
+app.use('/api', apiDocsExportRoutes);
 
 // 应用认证中间件到所有API路由
 app.use('/api', authMiddleware);

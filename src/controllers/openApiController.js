@@ -1,4 +1,5 @@
 import { ProjectsService } from '../services/projectsService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 /**
  * 对外 Open API 控制器
@@ -18,11 +19,7 @@ export class OpenApiController {
       const { code } = req.params;
       const json = await this.projectsService.getProjectJson(code);
 
-      return res.json({
-        success: true,
-        code,
-        data: json,
-      });
+      return sendSuccess(res, { projectCode: code, projectJson: json });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({
@@ -42,11 +39,10 @@ export class OpenApiController {
       const { code, language } = req.params;
       const config = await this.projectsService.getProjectConfigByCode(code, language);
 
-      return res.json({
-        success: true,
-        code,
+      return sendSuccess(res, {
+        projectCode: code,
         language: language || null,
-        data: config,
+        projectConfig: config,
       });
     } catch (error) {
       const notFound = error.message.includes('不存在') || error.message.includes('未找到语言配置');

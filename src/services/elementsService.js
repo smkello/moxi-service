@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { BaseService } from './baseService.js';
 
 /**
@@ -13,8 +14,8 @@ export class ElementsService extends BaseService {
   }
 
   async createElement(data) {
-    if (!data.id || !data.code || !data.name) {
-      throw new Error('元素ID、编码和名称不能为空');
+    if ( !data.code || !data.name) {
+      throw new Error('编码和名称不能为空');
     }
 
     const existing = await this.findOne({ code: data.code });
@@ -22,6 +23,7 @@ export class ElementsService extends BaseService {
       throw new Error('元素编码已存在');
     }
 
+    const elementId = randomUUID();
     const elementData = {
       ...data,
       description: data.description || '',
@@ -31,6 +33,8 @@ export class ElementsService extends BaseService {
       style: data.style || '',
       script: data.script || '',
       isSystem: data.isSystem ?? false,
+      id: elementId,
+      _id: elementId,
     };
 
     return this.create(elementData);

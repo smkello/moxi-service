@@ -1,4 +1,5 @@
 import { FieldsService } from '../services/fieldsService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 export class FieldsController {
   constructor() {
@@ -8,7 +9,7 @@ export class FieldsController {
   async listFields(req, res) {
     try {
       const fields = await this.service.listFields();
-      return res.json(fields);
+      return sendSuccess(res, fields);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -17,7 +18,7 @@ export class FieldsController {
   async createField(req, res) {
     try {
       const field = await this.service.createField(req.body);
-      return res.status(201).json(field);
+      return sendSuccess(res, field, { statusCode: 201 });
     } catch (error) {
       const statusCode = error.message.includes('已存在') ? 409 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -29,7 +30,7 @@ export class FieldsController {
       const { id } = req.params;
       await this.service.updateField(id, req.body);
       const field = await this.service.findById(id);
-      return res.json(field);
+      return sendSuccess(res, field);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 
                         error.message.includes('已存在') ? 409 : 400;
@@ -41,7 +42,7 @@ export class FieldsController {
     try {
       const { id } = req.params;
       await this.service.deleteField(id);
-      return res.json({ success: true });
+      return sendSuccess(res, { deleted: true });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -58,7 +59,7 @@ export class FieldsController {
       }
 
       const field = await this.service.toggleFieldStatus(id, status);
-      return res.json(field);
+      return sendSuccess(res, field);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });

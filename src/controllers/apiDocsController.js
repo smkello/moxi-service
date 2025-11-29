@@ -1,4 +1,5 @@
 import { ApiDocsService } from '../services/apiDocsService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 export class ApiDocsController {
   constructor() {
@@ -8,7 +9,7 @@ export class ApiDocsController {
   async summary(req, res) {
     try {
       const data = this.service.getSummary();
-      res.json(data);
+      return sendSuccess(res, data);
     } catch (error) {
       res.status(500).json({ error: error.message, success: false });
     }

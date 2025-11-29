@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { BaseService } from './baseService.js';
 
 /**
@@ -13,8 +14,8 @@ export class FieldsService extends BaseService {
   }
 
   async createField(data) {
-    if (!data.id || !data.code || !data.name) {
-      throw new Error('字段ID、编码和名称不能为空');
+    if ( !data.code || !data.name) {
+      throw new Error('编码和名称不能为空');
     }
 
     const existing = await this.findOne({ code: data.code });
@@ -22,10 +23,13 @@ export class FieldsService extends BaseService {
       throw new Error('字段编码已存在');
     }
 
+    const fieldId = randomUUID();
     const fieldData = {
       ...data,
       status: data.status !== undefined ? data.status : false,
       description: data.description || '',
+      id: fieldId,
+      _id: fieldId,
     };
 
     return this.create(fieldData);

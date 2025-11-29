@@ -1,4 +1,5 @@
 import { DatasourcesService } from '../services/datasourcesService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 export class DatasourcesController {
   constructor() {
@@ -8,7 +9,7 @@ export class DatasourcesController {
   async listDatasources(req, res) {
     try {
       const datasources = await this.service.listDatasources({ projectId: req.query.projectId });
-      return res.json(datasources);
+      return sendSuccess(res, datasources);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -17,7 +18,7 @@ export class DatasourcesController {
   async createDatasource(req, res) {
     try {
       const datasource = await this.service.createDatasource(req.body);
-      return res.status(201).json(datasource);
+      return sendSuccess(res, datasource, { statusCode: 201 });
     } catch (error) {
       const statusCode = error.message.includes('已存在') ? 409 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -29,7 +30,7 @@ export class DatasourcesController {
       const { id } = req.params;
       await this.service.updateDatasource(id, req.body);
       const datasource = await this.service.findById(id);
-      return res.json(datasource);
+      return sendSuccess(res, datasource);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 :
                         error.message.includes('已存在') ? 409 : 400;
@@ -41,7 +42,7 @@ export class DatasourcesController {
     try {
       const { id } = req.params;
       await this.service.deleteDatasource(id);
-      return res.json({ success: true });
+      return sendSuccess(res, { deleted: true });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -55,7 +56,7 @@ export class DatasourcesController {
       if (!datasource) {
         return res.status(404).json({ error: '数据源不存在', success: false });
       }
-      return res.json(datasource);
+      return sendSuccess(res, datasource);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -68,7 +69,7 @@ export class DatasourcesController {
       if (!datasource) {
         return res.status(404).json({ error: '数据源不存在', success: false });
       }
-      return res.json(datasource);
+      return sendSuccess(res, datasource);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -77,7 +78,8 @@ export class DatasourcesController {
   async testDatasource(req, res) {
     try {
       const result = await this.service.testDatasource(req.body);
-      return res.json(result);
+      const payload = result?.data ?? result;
+      return sendSuccess(res, payload);
     } catch (error) {
       return res.status(400).json({ error: error.message, success: false });
     }
@@ -87,7 +89,7 @@ export class DatasourcesController {
     try {
       const { id } = req.params;
       const data = await this.service.fetchDatasourceData(id);
-      return res.json({ success: true, data });
+      return sendSuccess(res, data);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });

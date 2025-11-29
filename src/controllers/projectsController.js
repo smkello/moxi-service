@@ -1,5 +1,6 @@
 import { ProjectsService } from '../services/projectsService.js';
 import { BaseController } from './baseController.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 /**
  * 项目管理控制器
@@ -17,7 +18,7 @@ export class ProjectsController extends BaseController {
     try {
       this.setUserFromRequest(req);
       const projects = await this.service.listProjects();
-      return res.json(projects);
+      return sendSuccess(res, projects);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -30,7 +31,7 @@ export class ProjectsController extends BaseController {
     try {
       this.setUserFromRequest(req);
       const project = await this.service.createProject(req.body);
-      return res.status(201).json(project);
+      return sendSuccess(res, project, { statusCode: 201 });
     } catch (error) {
       const statusCode = error.message.includes('已存在') ? 409 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -46,7 +47,7 @@ export class ProjectsController extends BaseController {
       const { id } = req.params;
       await this.service.updateProject(id, req.body);
       const project = await this.service.findById(id);
-      return res.json(project);
+      return sendSuccess(res, project);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 
                         error.message.includes('已存在') ? 409 : 400;
@@ -62,7 +63,7 @@ export class ProjectsController extends BaseController {
       this.setUserFromRequest(req);
       const { id } = req.params;
       await this.service.deleteProject(id);
-      return res.json({ success: true });
+      return sendSuccess(res, { deleted: true });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -83,7 +84,7 @@ export class ProjectsController extends BaseController {
       }
 
       const project = await this.service.toggleProjectStatus(id, status);
-      return res.json(project);
+      return sendSuccess(res, project);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -98,7 +99,7 @@ export class ProjectsController extends BaseController {
       this.setUserFromRequest(req);
       const { id, language } = req.params;
       const config = await this.service.saveProjectConfig(id, language, req.body);
-      return res.json(config);
+      return sendSuccess(res, config);
     } catch (error) {
       const statusCode = error.message.includes('不存在') || error.message.includes('不支持') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -113,7 +114,7 @@ export class ProjectsController extends BaseController {
       this.setUserFromRequest(req);
       const { id, language } = req.params;
       const config = await this.service.getProjectConfig(id, language);
-      return res.json(config);
+      return sendSuccess(res, config);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -128,7 +129,7 @@ export class ProjectsController extends BaseController {
       this.setUserFromRequest(req);
       const { code } = req.params;
       const json = await this.service.saveProjectJson(code, req.body);
-      return res.json(json);
+      return sendSuccess(res, json);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -143,7 +144,7 @@ export class ProjectsController extends BaseController {
       this.setUserFromRequest(req);
       const { code } = req.params;
       const json = await this.service.getProjectJson(code);
-      return res.json(json);
+      return sendSuccess(res, json);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });

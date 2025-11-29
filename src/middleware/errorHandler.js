@@ -6,9 +6,13 @@ export function errorHandler(err, req, res, next) {
 
   // 如果是验证错误
   if (err.name === 'ValidationError') {
-    return res.status(400).json({
-      error: err.message,
-      success: false,
+    return res.status(200).json({
+      data: {
+        code: err.code,
+        message: err.message,
+      },
+      
+      success: true,
     });
   }
 

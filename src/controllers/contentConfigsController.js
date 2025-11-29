@@ -1,4 +1,5 @@
 import { ContentConfigsService } from '../services/contentConfigsService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 /**
  * 内容配置管理控制器
@@ -11,7 +12,7 @@ export class ContentConfigsController {
   async listContentConfigs(req, res) {
     try {
       const configs = await this.service.listContentConfigs();
-      return res.json(configs);
+      return sendSuccess(res, configs);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -20,7 +21,7 @@ export class ContentConfigsController {
   async createContentConfig(req, res) {
     try {
       const config = await this.service.createContentConfig(req.body);
-      return res.status(201).json(config);
+      return sendSuccess(res, config, { statusCode: 201 });
     } catch (error) {
       const statusCode = error.message.includes('已存在') ? 409 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -32,7 +33,7 @@ export class ContentConfigsController {
       const { id } = req.params;
       await this.service.updateContentConfig(id, req.body);
       const config = await this.service.findById(id);
-      return res.json(config);
+      return sendSuccess(res, config);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 
                         error.message.includes('已存在') ? 409 : 400;
@@ -44,7 +45,7 @@ export class ContentConfigsController {
     try {
       const { id } = req.params;
       await this.service.deleteContentConfig(id);
-      return res.json({ success: true });
+      return sendSuccess(res, { deleted: true });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -58,7 +59,7 @@ export class ContentConfigsController {
       if (!config) {
         return res.status(404).json({ error: '内容配置不存在', success: false });
       }
-      return res.json(config);
+      return sendSuccess(res, config);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -74,7 +75,7 @@ export class ContentConfigsController {
       }
 
       const config = await this.service.toggleContentConfigStatus(id, status);
-      return res.json(config);
+      return sendSuccess(res, config);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });

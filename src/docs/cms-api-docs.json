@@ -7459,6 +7459,67 @@
               }
             }
           }
+        },
+        {
+          "id": "uploadComponentLibrary",
+          "name": "上传全局组件库ZIP包",
+          "description": "上传全局组件库压缩文件，文件名使用组件库编码覆盖。",
+          "method": "POST",
+          "path": "/component-libraries/upload",
+          "requestBody": {
+            "type": "multipart/form-data",
+            "description": "multipart/form-data，请求需携带登录token（Authorization: Bearer <token>）。",
+            "required": [
+              "libraryCode",
+              "zipFile"
+            ],
+            "properties": {
+              "libraryCode": {
+                "type": "string",
+                "description": "组件库编码（libraryCode 或 library_code）"
+              },
+              "zipFile": {
+                "type": "file",
+                "description": "zip格式的组件库资源文件"
+              }
+            }
+          },
+          "responseBody": {
+            "type": "object",
+            "description": "上传结果，业务失败也返回HTTP 200，需根据success判断。",
+            "properties": {
+              "success": {
+                "type": "boolean",
+                "description": "是否上传成功"
+              },
+              "code": {
+                "type": "string",
+                "description": "业务状态码，例如UPLOAD_SUCCESS"
+              },
+              "message": {
+                "type": "string",
+                "description": "提示信息"
+              },
+              "data": {
+                "type": "object",
+                "description": "成功时返回的上传结果",
+                "properties": {
+                  "libraryCode": {
+                    "type": "string",
+                    "description": "组件库编码"
+                  },
+                  "objectKey": {
+                    "type": "string",
+                    "description": "OSS对象Key"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "OSS访问地址"
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     }

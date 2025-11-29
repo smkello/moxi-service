@@ -1,4 +1,5 @@
 import { ElementsService } from '../services/elementsService.js';
+import { sendSuccess } from '../utils/responseHelpers.js';
 
 export class ElementsController {
   constructor() {
@@ -8,7 +9,7 @@ export class ElementsController {
   async listElements(req, res) {
     try {
       const elements = await this.service.listElements();
-      return res.json(elements);
+      return sendSuccess(res, elements);
     } catch (error) {
       return res.status(500).json({ error: error.message, success: false });
     }
@@ -17,7 +18,7 @@ export class ElementsController {
   async createElement(req, res) {
     try {
       const element = await this.service.createElement(req.body);
-      return res.status(201).json(element);
+      return sendSuccess(res, element, { statusCode: 201 });
     } catch (error) {
       const statusCode = error.message.includes('已存在') ? 409 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -29,7 +30,7 @@ export class ElementsController {
       const { id } = req.params;
       await this.service.updateElement(id, req.body);
       const element = await this.service.findById(id);
-      return res.json(element);
+      return sendSuccess(res, element);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 
                         error.message.includes('已存在') ? 409 : 400;
@@ -41,7 +42,7 @@ export class ElementsController {
     try {
       const { id } = req.params;
       await this.service.deleteElement(id);
-      return res.json({ success: true });
+      return sendSuccess(res, { deleted: true });
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 500;
       return res.status(statusCode).json({ error: error.message, success: false });
@@ -52,7 +53,7 @@ export class ElementsController {
     try {
       const { id } = req.params;
       const element = await this.service.updateElementOptions(id, req.body);
-      return res.json(element);
+      return sendSuccess(res, element);
     } catch (error) {
       const statusCode = error.message.includes('不存在') ? 404 : 400;
       return res.status(statusCode).json({ error: error.message, success: false });

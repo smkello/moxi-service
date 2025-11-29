@@ -32,6 +32,18 @@ router.post('/design-projects/upload', (req, res, next) => {
     return controller.uploadDesignProjectPackage(req, res);
   });
 });
+router.post('/component-libraries/upload', (req, res, next) => {
+  upload.single('zipFile')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        code: 'FILE_UPLOAD_ERROR',
+        message: err.message,
+      });
+    }
+    return controller.uploadGlobalComponentLibrary(req, res);
+  });
+});
 
 export default router;
 
