@@ -113,6 +113,9 @@ export class DesignProjectsController {
       const ossService = this.getOssService();
       const result = await ossService.uploadZip(filename, req.file.buffer);
 
+      // 构建访问地址：https://{projectCode}.aeon.smkello.cn
+      const accessUrl = `https://${projectCode}.aeon.smkello.cn`;
+
       return sendSuccess(
         res,
         {
@@ -120,7 +123,8 @@ export class DesignProjectsController {
           projectId,
           projectCode,
           objectKey: result.objectKey,
-          url: result.url,
+          // url: result.url,
+          accessUrl,
         },
         { message: '文件上传成功' },
       );

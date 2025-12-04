@@ -28,10 +28,10 @@ app.use(helmet({
 }));
 
 // CORS 配置
-// app.use(cors({
-//   origin: process.env.CORS_ORIGIN || '*',
-//   credentials: true,
-// }));
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  credentials: true,
+}));
 
 // 日志中间件
 if (config.server.debug || config.server.env === 'development') {

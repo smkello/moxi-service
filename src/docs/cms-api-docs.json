@@ -7421,7 +7421,7 @@
           },
           "responseBody": {
             "type": "object",
-            "description": "上传结果，业务失败也返回HTTP 200，需根据success判断。",
+            "description": "上传结果。成功时返回标准成功响应结构，失败时可能返回HTTP 400/500或业务失败（HTTP 200但success=false），需根据success和HTTP状态码判断。",
             "properties": {
               "success": {
                 "type": "boolean",
@@ -7429,31 +7429,49 @@
               },
               "code": {
                 "type": "string",
-                "description": "业务状态码，例如UPLOAD_SUCCESS、PROJECT_NOT_FOUND"
+                "description": "错误状态码（仅在失败时存在顶层），成功时为'0000'且在data.code中。可能值：MISSING_PARAMS、FILE_REQUIRED、PROJECT_NOT_FOUND、PROJECT_CODE_MISMATCH、OSS_UPLOAD_FAILED"
               },
               "message": {
                 "type": "string",
-                "description": "提示信息"
+                "description": "提示信息（失败时在顶层，成功时在data.message中）"
               },
               "data": {
                 "type": "object",
-                "description": "成功时返回的上传结果",
+                "description": "成功时返回的数据结构",
                 "properties": {
-                  "projectId": {
+                  "code": {
                     "type": "string",
-                    "description": "项目ID"
+                    "description": "业务状态码，成功时固定为'0000'"
                   },
-                  "projectCode": {
+                  "message": {
                     "type": "string",
-                    "description": "项目编码"
+                    "description": "成功提示信息，例如：文件上传成功"
                   },
-                  "objectKey": {
-                    "type": "string",
-                    "description": "OSS对象Key（含可选前缀）"
-                  },
-                  "url": {
-                    "type": "string",
-                    "description": "OSS访问地址"
+                  "result": {
+                    "type": "object",
+                    "description": "实际上传结果数据",
+                    "properties": {
+                      "bizCode": {
+                        "type": "string",
+                        "description": "业务代码，固定为'UPLOAD_SUCCESS'"
+                      },
+                      "projectId": {
+                        "type": "string",
+                        "description": "项目ID"
+                      },
+                      "projectCode": {
+                        "type": "string",
+                        "description": "项目编码"
+                      },
+                      "objectKey": {
+                        "type": "string",
+                        "description": "OSS对象Key（含可选前缀）"
+                      },
+                      "accessUrl": {
+                        "type": "string",
+                        "description": "项目访问地址，格式：https://{projectCode}.aeon.smkello.cn"
+                      }
+                    }
                   }
                 }
               }
