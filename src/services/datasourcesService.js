@@ -1,4 +1,5 @@
 import { BaseService } from './baseService.js';
+import config from '../config/index.js';
 
 /**
  * 数据源管理服务
@@ -127,39 +128,43 @@ export class DatasourcesService extends BaseService {
   }
 
   async performRemoteRequest(datasource) {
-    const { config } = datasource;
-    if (!config || !config.apiUrl) {
+    const { config: dsConfig } = datasource;
+    if (!dsConfig || !dsConfig.apiUrl) {
       throw new Error('远程数据源缺少 apiUrl 配置');
     }
 
-    const headers = { 'Content-Type': 'application/json', ...(config.headers || {}) };
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-System-Code': config.system.code,
+      ...(dsConfig.headers || {}),
+    };
     let tokenValue;
 
-    if (config.requiresToken) {
-      if (!config.tokenApi || !config.tokenField) {
+    if (dsConfig.requiresToken) {
+      if (!dsConfig.tokenApi || !dsConfig.tokenField) {
         throw new Error('远程数据源缺少 Token 配置');
       }
-      const tokenResponse = await fetch(config.tokenApi, {
+      const tokenResponse = await fetch(dsConfig.tokenApi, {
         method: 'POST',
         headers,
-        body: config.tokenBody || '',
+        body: dsConfig.tokenBody || '',
       });
       if (!tokenResponse.ok) {
         throw new Error('获取 Token 失败');
       }
       const tokenJson = await tokenResponse.json();
-      tokenValue = tokenJson[config.tokenField];
+      tokenValue = tokenJson[dsConfig.tokenField];
       if (!tokenValue) {
         throw new Error('Token 响应中缺少指定字段');
       }
-      headers.Authorization = config.tokenType
-        ? `${config.tokenType} ${tokenValue}`
+      headers.Authorization = dsConfig.tokenType
+        ? `${dsConfig.tokenType} ${tokenValue}`
         : tokenValue;
     }
 
-    const url = new URL(config.apiUrl);
-    if (config.params) {
-      Object.entries(config.params).forEach(([key, value]) => {
+    const url = new URL(dsConfig.apiUrl);
+    if (dsConfig.params) {
+      Object.entries(dsConfig.params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           url.searchParams.set(key, value);
         }
@@ -167,14 +172,14 @@ export class DatasourcesService extends BaseService {
     }
 
     const requestInit = {
-      method: (config.method || 'GET').toUpperCase(),
+      method: (dsConfig.method || 'GET').toUpperCase(),
       headers,
     };
 
-    if (config.body && requestInit.method !== 'GET') {
-      requestInit.body = typeof config.body === 'string'
-        ? config.body
-        : JSON.stringify(config.body);
+    if (dsConfig.body && requestInit.method !== 'GET') {
+      requestInit.body = typeof dsConfig.body === 'string'
+        ? dsConfig.body
+        : JSON.stringify(dsConfig.body);
     }
 
     const response = await fetch(url, requestInit);

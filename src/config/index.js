@@ -77,6 +77,12 @@ const config = {
       forceCheck: process.env.SDK_HEARTBEAT_FORCE_CHECK === 'true',
     },
   },
+
+  // 系统配置
+  system: {
+    // 系统编码，用于标识当前系统
+    code: process.env.SYSTEM_CODE || 'CONTENT_MANAGEMENT',
+  },
 };
 
 // 验证配置

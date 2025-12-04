@@ -32,6 +32,8 @@ export function createAuthMiddleware(options = {}) {
 
     // 从请求头获取Authorization token
     const authHeader = req.headers.authorization || req.headers.Authorization;
+    // 透传站点标识 X-Site
+    const xSite = req.headers['x-site'] || req.headers['X-Site'];
     
     debugLog('验证请求:', req.method, req.path);
     
@@ -66,6 +68,8 @@ export function createAuthMiddleware(options = {}) {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
+          'X-System-Code': config.system.code,
+          ...(xSite ? { 'X-Site': xSite } : {}),
         },
       });
 
